@@ -1,13 +1,27 @@
 const express = require('express')
 const app = express()
-const port = 3001 || process.env.PORT
+const axios = require('axios')
+const HOST = 'localhost'
+const PORT = 3001 || process.env.PORT
 
 app.use(express.json())
 
-app.get('/auth', (req, res, next) => {
+app.get('/login', (req, res, next) => {
     res.send('Hello from the auth server!')
 })
 
-app.listen(port, () => {
-    console.log('Auth server listening on port 3001')
+app.listen(PORT, async () => {
+    const response = await axios({
+        method: 'post',
+        url: 'http://localhost:3000/register',
+        headers: { 'Content-Type': 'application/json' },
+        data: {
+            apiName: "auth",
+            protocol: "http",
+            host: HOST,
+            port: PORT,
+        }
+    })
+    console.log(response.data)
+    console.log(`Auth server listening on port ${PORT}`)
 }) 
