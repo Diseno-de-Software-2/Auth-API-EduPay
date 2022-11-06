@@ -3,18 +3,53 @@ const app = express()
 const axios = require('axios')
 const HOST = 'localhost'
 const cors = require('cors')
+const mysql = require('mysql2')
+const jwt = require('jsonwebtoken')
 const PORT = 3001 || process.env.PORT
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
+    database: 'sistemainstitucional'
+})
+
+connection.connect(function (err) {
+    if (err) throw err
+    console.log('Connected!')
+})
 
 app.use(express.json())
 app.use(cors())
 
 app.post('/login', (req, res, next) => {
-    // const { username, password } = req.body
-    if (true) {
-        res.send('Logged in successfully')
-    } else {
-        res.status(401).send('Unauthorized')
-    }
+    const { email, password } = req.body
+    const query = `SELECT nombre, apellidos, email, id, tipo, fecha_nacimiento FROM personas WHERE email = '${email}' AND contraseña = '${password}'`
+
+    connection.query(query, (err, result) => {
+        if (err) {
+            res.status(500).send(err)
+        } else {
+            if (result.length > 0) {
+
+                const envio = {
+                    user: {
+                        nombre: result[0].nombre,
+                        apellidos: result[0].apellidos,
+                        email: result[0].email,
+                        id: result[0].id,
+                        tipo: result[0].tipo,
+                        fecha_nacimiento: result[0].fecha_nacimiento
+                    },
+                    token: generateToken(result[0].id)
+                }
+
+                res.send(envio)
+            } else {
+                res.status(400).send('Email o contraseña incorrectos')
+            }
+        }
+    })
 })
 
 app.listen(PORT, async () => {
@@ -35,4 +70,8 @@ app.listen(PORT, async () => {
     })
     console.log(response.data)
     console.log(`Auth server listening on port ${PORT}`)
-}) 
+})
+
+function generateToken(user) {
+    return jwt.sign({ data: user }, 'secret', { expiresIn: '10h' })
+}
