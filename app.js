@@ -2,12 +2,19 @@ const express = require('express')
 const app = express()
 const axios = require('axios')
 const HOST = 'localhost'
+const cors = require('cors')
 const PORT = 3001 || process.env.PORT
 
 app.use(express.json())
+app.use(cors())
 
-app.get('/login', (req, res, next) => {
-    res.send('Hello from the auth server!')
+app.post('/login', (req, res, next) => {
+    // const { username, password } = req.body
+    if (true) {
+        res.send('Logged in successfully')
+    } else {
+        res.status(401).send('Unauthorized')
+    }
 })
 
 app.listen(PORT, async () => {
@@ -21,6 +28,10 @@ app.listen(PORT, async () => {
             host: HOST,
             port: PORT,
         }
+    })
+    await axios.post('http://localhost:3000/switch/auth', {
+        "url": "http://localhost:3001",
+        "enabled": true
     })
     console.log(response.data)
     console.log(`Auth server listening on port ${PORT}`)
