@@ -24,7 +24,7 @@ app.use(cors())
 
 app.post('/login', (req, res, next) => {
     const { email, password } = req.body
-    const query = `SELECT nombre, apellidos, email, id, tipo, fecha_nacimiento FROM personas WHERE email = '${email}' AND contraseña = '${password}'`
+    const query = `SELECT * FROM personas WHERE email = '${email}' AND contraseña = '${password}'`
 
     connection.query(query, (err, result) => {
         if (err) {
@@ -39,7 +39,8 @@ app.post('/login', (req, res, next) => {
                         email: result[0].email,
                         id: result[0].id,
                         tipo: result[0].tipo,
-                        fecha_nacimiento: result[0].fecha_nacimiento
+                        fecha_nacimiento: result[0].fecha_nacimiento,
+                        contraseña: result[0].contraseña
                     },
                     token: generateToken(result[0].id)
                 }
