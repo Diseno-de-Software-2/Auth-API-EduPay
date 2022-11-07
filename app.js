@@ -5,7 +5,8 @@ const HOST = 'localhost'
 const cors = require('cors')
 const mysql = require('mysql2')
 const jwt = require('jsonwebtoken')
-const PORT = 3001 || process.env.PORT
+const morgan = require('morgan')
+const PORT = 3050 || process.env.PORT
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -21,15 +22,17 @@ connection.connect(function (err) {
 
 app.use(express.json())
 app.use(cors())
+app.use(morgan('dev'))
 
 app.post('/login', (req, res, next) => {
     const { email, password } = req.body
     const query = `SELECT * FROM personas WHERE email = '${email}' AND contraseña = '${password}'`
-
+    console.log(query)
     connection.query(query, (err, result) => {
         if (err) {
             res.status(500).send(err)
         } else {
+            console.log(result)
             if (result.length > 0) {
 
                 const envio = {
@@ -44,7 +47,7 @@ app.post('/login', (req, res, next) => {
                     },
                     token: generateToken(result[0].id)
                 }
-
+                console.log("wut?")
                 res.send(envio)
             } else {
                 res.status(400).send('Email o contraseña incorrectos')
