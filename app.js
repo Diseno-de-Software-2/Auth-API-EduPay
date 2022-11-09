@@ -32,7 +32,6 @@ app.post('/login', (req, res, next) => {
         if (err) {
             res.status(500).send(err)
         } else {
-            console.log(result)
             if (result.length > 0) {
 
                 const envio = {
@@ -47,7 +46,6 @@ app.post('/login', (req, res, next) => {
                     },
                     token: generateToken(result[0].id)
                 }
-                console.log("wut?")
                 res.send(envio)
             } else {
                 res.status(400).send('Email o contraseña incorrectos')
