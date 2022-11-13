@@ -6,6 +6,8 @@ const cors = require('cors')
 const mysql = require('mysql2')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+var setTerminalTitle = require('set-terminal-title');
+setTerminalTitle('Autorization service', { verbose: true });
 const PORT = 3050 || process.env.PORT
 
 const connection = mysql.createConnection({
