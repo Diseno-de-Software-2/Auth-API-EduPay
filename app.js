@@ -6,9 +6,12 @@ const cors = require('cors')
 const mysql = require('mysql2')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+var portfinder = require('portfinder');
+portfinder.setBasePort(3050);
+portfinder.setHighestPort(3099);
 var setTerminalTitle = require('set-terminal-title');
 setTerminalTitle('Autorization service', { verbose: true });
-const PORT = 3050 || process.env.PORT
+var PORT;
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -56,24 +59,27 @@ app.post('/login', (req, res, next) => {
     })
 })
 
-app.listen(PORT, async () => {
-    const response = await axios({
-        method: 'post',
-        url: 'http://localhost:3000/register',
-        headers: { 'Content-Type': 'application/json' },
-        data: {
-            apiName: "auth",
-            protocol: "http",
-            host: HOST,
-            port: PORT,
-        }
+portfinder.getPort(function (err, port) {
+    PORT = port
+    app.listen(PORT, async () => {
+        const response = await axios({
+            method: 'post',
+            url: 'http://localhost:3000/register',
+            headers: { 'Content-Type': 'application/json' },
+            data: {
+                apiName: "auth",
+                protocol: "http",
+                host: HOST,
+                port: PORT,
+            }
+        })
+        await axios.post('http://localhost:3000/switch/auth', {
+            "url": "http://localhost:" + PORT,
+            "enabled": true
+        })
+        console.log(response.data)
+        console.log(`Auth server listening on port ${PORT}`)
     })
-    await axios.post('http://localhost:3000/switch/auth', {
-        "url": "http://localhost:" + PORT,
-        "enabled": true
-    })
-    console.log(response.data)
-    console.log(`Auth server listening on port ${PORT}`)
 })
 
 function generateToken(user) {
