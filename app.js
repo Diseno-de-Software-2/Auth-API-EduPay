@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const credentials = require('../db_credentials');
 const axios = require('axios')
 const HOST = 'localhost'
 const cors = require('cors')
@@ -12,12 +13,15 @@ portfinder.setHighestPort(3099);
 var setTerminalTitle = require('set-terminal-title');
 setTerminalTitle('Autorization service', { verbose: true });
 var PORT;
+const DB_NAME = 'sistemainstitucional'
+const DB_USER = credentials['DB_USER']
+const DB_PASSWORD = credentials['DB_PASSWORD']
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'sistemainstitucional'
+    host: HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME
 })
 
 connection.connect(function (err) {
